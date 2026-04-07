@@ -100,7 +100,7 @@ class SessionManagerTest {
     @Test
     fun `session expires when timer reaches zero`() =
         testScope.runTest {
-            val timeoutSeconds = 5
+            val timeoutSeconds = SessionConfig.MIN_TIMEOUT_SECONDS
             sessionManager.startSession(SessionConfig(timeoutSeconds = timeoutSeconds))
 
             // Advance past the full countdown duration
@@ -113,7 +113,7 @@ class SessionManagerTest {
     @Test
     fun `resetToIdle works after EXPIRED`() =
         testScope.runTest {
-            val timeoutSeconds = 3
+            val timeoutSeconds = SessionConfig.MIN_TIMEOUT_SECONDS
             sessionManager.startSession(SessionConfig(timeoutSeconds = timeoutSeconds))
             advanceTimeBy((timeoutSeconds + 1).toLong() * SessionTimer.TICK_INTERVAL_MS)
 
@@ -126,15 +126,16 @@ class SessionManagerTest {
     @Test
     fun `remaining seconds counts down`() =
         testScope.runTest {
-            sessionManager.startSession(SessionConfig(timeoutSeconds = 5))
+            val timeout = SessionConfig.MIN_TIMEOUT_SECONDS
+            sessionManager.startSession(SessionConfig(timeoutSeconds = timeout))
 
             advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
-            assertEquals(5, sessionManager.remainingSeconds.value)
+            assertEquals(timeout, sessionManager.remainingSeconds.value)
 
             advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
-            assertEquals(4, sessionManager.remainingSeconds.value)
+            assertEquals(timeout - 1, sessionManager.remainingSeconds.value)
 
             advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
-            assertEquals(3, sessionManager.remainingSeconds.value)
+            assertEquals(timeout - 2, sessionManager.remainingSeconds.value)
         }
 }
