@@ -14,7 +14,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SessionManagerTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
     private lateinit var sessionTimer: SessionTimer
@@ -34,36 +33,39 @@ class SessionManagerTest {
     }
 
     @Test
-    fun `startSession transitions from IDLE to ACTIVE`() = testScope.runTest {
-        val config = SessionConfig(timeoutSeconds = 60)
-        val started = sessionManager.startSession(config)
+    fun `startSession transitions from IDLE to ACTIVE`() =
+        testScope.runTest {
+            val config = SessionConfig(timeoutSeconds = 60)
+            val started = sessionManager.startSession(config)
 
-        assertTrue(started)
-        assertEquals(SessionState.ACTIVE, sessionManager.state.value)
-        assertEquals(60, sessionManager.remainingSeconds.value)
-        assertEquals(config, sessionManager.activeConfig)
-    }
-
-    @Test
-    fun `startSession returns false when already ACTIVE`() = testScope.runTest {
-        val config = SessionConfig(timeoutSeconds = 60)
-        sessionManager.startSession(config)
-        advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
-
-        val secondStart = sessionManager.startSession(config)
-        assertFalse(secondStart)
-    }
+            assertTrue(started)
+            assertEquals(SessionState.ACTIVE, sessionManager.state.value)
+            assertEquals(60, sessionManager.remainingSeconds.value)
+            assertEquals(config, sessionManager.activeConfig)
+        }
 
     @Test
-    fun `closeSession transitions from ACTIVE to CLOSED`() = testScope.runTest {
-        sessionManager.startSession(SessionConfig(timeoutSeconds = 60))
-        advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
+    fun `startSession returns false when already ACTIVE`() =
+        testScope.runTest {
+            val config = SessionConfig(timeoutSeconds = 60)
+            sessionManager.startSession(config)
+            advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
 
-        sessionManager.closeSession()
+            val secondStart = sessionManager.startSession(config)
+            assertFalse(secondStart)
+        }
 
-        assertEquals(SessionState.CLOSED, sessionManager.state.value)
-        assertEquals(0, sessionManager.remainingSeconds.value)
-    }
+    @Test
+    fun `closeSession transitions from ACTIVE to CLOSED`() =
+        testScope.runTest {
+            sessionManager.startSession(SessionConfig(timeoutSeconds = 60))
+            advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
+
+            sessionManager.closeSession()
+
+            assertEquals(SessionState.CLOSED, sessionManager.state.value)
+            assertEquals(0, sessionManager.remainingSeconds.value)
+        }
 
     @Test
     fun `closeSession does nothing when IDLE`() {
@@ -72,62 +74,67 @@ class SessionManagerTest {
     }
 
     @Test
-    fun `resetToIdle transitions from CLOSED to IDLE`() = testScope.runTest {
-        sessionManager.startSession(SessionConfig(timeoutSeconds = 60))
-        advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
-        sessionManager.closeSession()
+    fun `resetToIdle transitions from CLOSED to IDLE`() =
+        testScope.runTest {
+            sessionManager.startSession(SessionConfig(timeoutSeconds = 60))
+            advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
+            sessionManager.closeSession()
 
-        sessionManager.resetToIdle()
+            sessionManager.resetToIdle()
 
-        assertEquals(SessionState.IDLE, sessionManager.state.value)
-        assertNull(sessionManager.activeConfig)
-    }
-
-    @Test
-    fun `resetToIdle does nothing when ACTIVE`() = testScope.runTest {
-        sessionManager.startSession(SessionConfig(timeoutSeconds = 60))
-        advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
-
-        sessionManager.resetToIdle()
-
-        assertEquals(SessionState.ACTIVE, sessionManager.state.value)
-    }
+            assertEquals(SessionState.IDLE, sessionManager.state.value)
+            assertNull(sessionManager.activeConfig)
+        }
 
     @Test
-    fun `session expires when timer reaches zero`() = testScope.runTest {
-        val timeoutSeconds = 5
-        sessionManager.startSession(SessionConfig(timeoutSeconds = timeoutSeconds))
+    fun `resetToIdle does nothing when ACTIVE`() =
+        testScope.runTest {
+            sessionManager.startSession(SessionConfig(timeoutSeconds = 60))
+            advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
 
-        // Advance past the full countdown duration
-        advanceTimeBy((timeoutSeconds + 1).toLong() * SessionTimer.TICK_INTERVAL_MS)
+            sessionManager.resetToIdle()
 
-        assertEquals(SessionState.EXPIRED, sessionManager.state.value)
-        assertEquals(0, sessionManager.remainingSeconds.value)
-    }
-
-    @Test
-    fun `resetToIdle works after EXPIRED`() = testScope.runTest {
-        val timeoutSeconds = 3
-        sessionManager.startSession(SessionConfig(timeoutSeconds = timeoutSeconds))
-        advanceTimeBy((timeoutSeconds + 1).toLong() * SessionTimer.TICK_INTERVAL_MS)
-
-        assertEquals(SessionState.EXPIRED, sessionManager.state.value)
-
-        sessionManager.resetToIdle()
-        assertEquals(SessionState.IDLE, sessionManager.state.value)
-    }
+            assertEquals(SessionState.ACTIVE, sessionManager.state.value)
+        }
 
     @Test
-    fun `remaining seconds counts down`() = testScope.runTest {
-        sessionManager.startSession(SessionConfig(timeoutSeconds = 5))
+    fun `session expires when timer reaches zero`() =
+        testScope.runTest {
+            val timeoutSeconds = 5
+            sessionManager.startSession(SessionConfig(timeoutSeconds = timeoutSeconds))
 
-        advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
-        assertEquals(5, sessionManager.remainingSeconds.value)
+            // Advance past the full countdown duration
+            advanceTimeBy((timeoutSeconds + 1).toLong() * SessionTimer.TICK_INTERVAL_MS)
 
-        advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
-        assertEquals(4, sessionManager.remainingSeconds.value)
+            assertEquals(SessionState.EXPIRED, sessionManager.state.value)
+            assertEquals(0, sessionManager.remainingSeconds.value)
+        }
 
-        advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
-        assertEquals(3, sessionManager.remainingSeconds.value)
-    }
+    @Test
+    fun `resetToIdle works after EXPIRED`() =
+        testScope.runTest {
+            val timeoutSeconds = 3
+            sessionManager.startSession(SessionConfig(timeoutSeconds = timeoutSeconds))
+            advanceTimeBy((timeoutSeconds + 1).toLong() * SessionTimer.TICK_INTERVAL_MS)
+
+            assertEquals(SessionState.EXPIRED, sessionManager.state.value)
+
+            sessionManager.resetToIdle()
+            assertEquals(SessionState.IDLE, sessionManager.state.value)
+        }
+
+    @Test
+    fun `remaining seconds counts down`() =
+        testScope.runTest {
+            sessionManager.startSession(SessionConfig(timeoutSeconds = 5))
+
+            advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
+            assertEquals(5, sessionManager.remainingSeconds.value)
+
+            advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
+            assertEquals(4, sessionManager.remainingSeconds.value)
+
+            advanceTimeBy(SessionTimer.TICK_INTERVAL_MS)
+            assertEquals(3, sessionManager.remainingSeconds.value)
+        }
 }

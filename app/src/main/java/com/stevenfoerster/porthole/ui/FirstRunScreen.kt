@@ -35,10 +35,11 @@ fun FirstRunScreen(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
@@ -57,53 +58,58 @@ fun FirstRunScreen(
 
         SectionCard(
             title = "What Porthole Does",
-            content = "Porthole provides a safe, controlled way to authenticate with captive " +
-                "portals (hotel WiFi, airport WiFi, coffee shops) without exposing your " +
-                "regular browsing traffic. It opens a sandboxed browser session that is " +
-                "isolated from the rest of your device.",
+            content =
+                "Porthole provides a safe, controlled way to authenticate with captive " +
+                    "portals (hotel WiFi, airport WiFi, coffee shops) without exposing your " +
+                    "regular browsing traffic. It opens a sandboxed browser session that is " +
+                    "isolated from the rest of your device.",
         )
 
         SectionCard(
             title = "What Porthole Does NOT Do",
-            content = "Porthole is NOT a VPN and does NOT protect your traffic during a session. " +
-                "While Porthole is active, the app intentionally operates outside your VPN " +
-                "tunnel so it can reach the captive portal. All other apps remain protected " +
-                "by your VPN.",
+            content =
+                "Porthole is NOT a VPN and does NOT protect your traffic during a session. " +
+                    "While Porthole is active, the app intentionally operates outside your VPN " +
+                    "tunnel so it can reach the captive portal. All other apps remain protected " +
+                    "by your VPN.",
         )
 
         SectionCard(
             title = "Setup Required: VPN Exclusion",
-            content = "For Porthole to work, you must add it to your VPN app's excluded " +
-                "apps list (also called split tunneling or per-app exclusion).\n\n" +
-                "In WireGuard for Android:\n" +
-                "1. Open the WireGuard app\n" +
-                "2. Tap your active tunnel\n" +
-                "3. Tap the edit (pencil) icon\n" +
-                "4. Scroll down to \"Excluded Applications\"\n" +
-                "5. Check \"Porthole\" in the app list\n" +
-                "6. Save the tunnel configuration\n\n" +
-                "This ensures Porthole's traffic bypasses the tunnel while all " +
-                "other apps remain protected.",
+            content =
+                "For Porthole to work, you must add it to your VPN app's excluded " +
+                    "apps list (also called split tunneling or per-app exclusion).\n\n" +
+                    "In WireGuard for Android:\n" +
+                    "1. Open the WireGuard app\n" +
+                    "2. Tap your active tunnel\n" +
+                    "3. Tap the edit (pencil) icon\n" +
+                    "4. Scroll down to \"Excluded Applications\"\n" +
+                    "5. Check \"Porthole\" in the app list\n" +
+                    "6. Save the tunnel configuration\n\n" +
+                    "This ensures Porthole's traffic bypasses the tunnel while all " +
+                    "other apps remain protected.",
         )
 
         SectionCard(
             title = "Security Properties",
-            content = "• Sessions are time-limited (max 10 minutes)\n" +
-                "• The browser is destroyed after each session\n" +
-                "• All cookies and data are wiped on session end\n" +
-                "• JavaScript is disabled by default\n" +
-                "• Navigation is restricted to local network addresses\n" +
-                "• A persistent notification warns you when the tunnel is bypassed",
+            content =
+                "• Sessions are time-limited (max 10 minutes)\n" +
+                    "• The browser is destroyed after each session\n" +
+                    "• All cookies and data are wiped on session end\n" +
+                    "• JavaScript is disabled by default\n" +
+                    "• Navigation is restricted to local network addresses\n" +
+                    "• A persistent notification warns you when the tunnel is bypassed",
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = onConfirm,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .align(Alignment.CenterHorizontally),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .align(Alignment.CenterHorizontally),
         ) {
             Text(
                 text = "I Understand",
@@ -124,9 +130,10 @@ private fun SectionCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

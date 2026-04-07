@@ -8,7 +8,6 @@ import org.junit.Before
 import org.junit.Test
 
 class AllowlistManagerTest {
-
     private lateinit var manager: AllowlistManager
 
     @Before

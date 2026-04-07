@@ -29,8 +29,10 @@ class PortholeWebViewClient(
     private val onPageStarted: (String) -> Unit = {},
     private val onPageFinished: (String) -> Unit = {},
 ) : WebViewClient() {
-
-    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+    override fun shouldOverrideUrlLoading(
+        view: WebView,
+        request: WebResourceRequest,
+    ): Boolean {
         val url = request.url.toString()
         if (!allowlistManager.isAllowed(url)) {
             onNavigationBlocked(url)
@@ -60,12 +62,19 @@ class PortholeWebViewClient(
         return null
     }
 
-    override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
+    override fun onPageStarted(
+        view: WebView,
+        url: String?,
+        favicon: Bitmap?,
+    ) {
         super.onPageStarted(view, url, favicon)
         url?.let { onPageStarted(it) }
     }
 
-    override fun onPageFinished(view: WebView, url: String?) {
+    override fun onPageFinished(
+        view: WebView,
+        url: String?,
+    ) {
         super.onPageFinished(view, url)
         url?.let { onPageFinished(it) }
     }

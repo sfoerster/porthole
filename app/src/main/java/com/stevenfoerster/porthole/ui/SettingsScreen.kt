@@ -76,17 +76,19 @@ fun SettingsScreen(
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Timeout slider
             SettingsCard(title = "Session Timeout") {
-                val currentIndex = TIMEOUT_OPTIONS.indexOf(config.timeoutSeconds)
-                    .coerceAtLeast(0)
+                val currentIndex =
+                    TIMEOUT_OPTIONS.indexOf(config.timeoutSeconds)
+                        .coerceAtLeast(0)
 
                 Text(
                     text = formatTimeout(config.timeoutSeconds),
@@ -106,8 +108,9 @@ fun SettingsScreen(
                 )
 
                 Text(
-                    text = "Maximum session duration before auto-close. " +
-                        "Hard limit: ${SessionConfig.MAX_TIMEOUT_SECONDS / 60} minutes.",
+                    text =
+                        "Maximum session duration before auto-close. " +
+                            "Hard limit: ${SessionConfig.MAX_TIMEOUT_SECONDS / 60} minutes.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -133,17 +136,19 @@ fun SettingsScreen(
                 if (config.jsEnabled) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Warning: Enabling JavaScript increases the attack surface. " +
-                            "A hostile portal operator could execute scripts in the WebView. " +
-                            "Only enable this if the portal requires it.",
+                        text =
+                            "Warning: Enabling JavaScript increases the attack surface. " +
+                                "A hostile portal operator could execute scripts in the WebView. " +
+                                "Only enable this if the portal requires it.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error,
                     )
                 } else {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "JavaScript is disabled for security. " +
-                            "Some portals may require it to function.",
+                        text =
+                            "JavaScript is disabled for security. " +
+                                "Some portals may require it to function.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -170,14 +175,15 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = if (config.strictMode) {
-                        "Strict mode: Only local network addresses (RFC 1918) and the WiFi " +
-                            "gateway are allowed. Most captive portals work in this mode."
-                    } else {
-                        "Permissive mode: External domains are allowed with your confirmation. " +
-                            "Use this if the portal redirects to an external authentication " +
-                            "service (e.g., social login)."
-                    },
+                    text =
+                        if (config.strictMode) {
+                            "Strict mode: Only local network addresses (RFC 1918) and the WiFi " +
+                                "gateway are allowed. Most captive portals work in this mode."
+                        } else {
+                            "Permissive mode: External domains are allowed with your confirmation. " +
+                                "Use this if the portal redirects to an external authentication " +
+                                "service (e.g., social login)."
+                        },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -196,8 +202,9 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "URL polled to detect when captive portal authentication succeeds. " +
-                        "Should return HTTP 204 when internet is available.",
+                    text =
+                        "URL polled to detect when captive portal authentication succeeds. " +
+                            "Should return HTTP 204 when internet is available.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -214,9 +221,10 @@ private fun SettingsCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

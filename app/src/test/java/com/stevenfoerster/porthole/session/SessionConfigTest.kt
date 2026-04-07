@@ -4,7 +4,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class SessionConfigTest {
-
     @Test
     fun `default config has expected values`() {
         val config = SessionConfig()

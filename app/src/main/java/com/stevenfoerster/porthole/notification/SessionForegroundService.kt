@@ -17,11 +17,14 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class SessionForegroundService : Service() {
-
     @Inject
     lateinit var notificationManager: SessionNotificationManager
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         val remainingSeconds = intent?.getIntExtra(EXTRA_REMAINING_SECONDS, 0) ?: 0
 
         when (intent?.action) {
@@ -66,14 +69,20 @@ class SessionForegroundService : Service() {
         const val EXTRA_REMAINING_SECONDS = "remaining_seconds"
 
         /** Creates an intent to start the service with the given remaining seconds. */
-        fun startIntent(context: Context, remainingSeconds: Int): Intent =
+        fun startIntent(
+            context: Context,
+            remainingSeconds: Int,
+        ): Intent =
             Intent(context, SessionForegroundService::class.java).apply {
                 action = ACTION_START
                 putExtra(EXTRA_REMAINING_SECONDS, remainingSeconds)
             }
 
         /** Creates an intent to update the notification countdown. */
-        fun updateIntent(context: Context, remainingSeconds: Int): Intent =
+        fun updateIntent(
+            context: Context,
+            remainingSeconds: Int,
+        ): Intent =
             Intent(context, SessionForegroundService::class.java).apply {
                 action = ACTION_UPDATE
                 putExtra(EXTRA_REMAINING_SECONDS, remainingSeconds)

@@ -22,61 +22,65 @@ import javax.inject.Singleton
  * Uses [HttpURLConnection] directly — no third-party networking libraries.
  */
 @Singleton
-class ConnectivityChecker @Inject constructor() {
-
-    /**
-     * Emits a [Flow] of booleans indicating whether internet connectivity
-     * has been established (i.e., captive portal authentication succeeded).
-     *
-     * @param checkUrl The URL to poll. Defaults to [DEFAULT_CHECK_URL].
-     * @return A [Flow] that emits true when a 204 response is received, false otherwise.
-     */
-    fun checkConnectivity(checkUrl: String = DEFAULT_CHECK_URL): Flow<Boolean> = flow {
-        while (currentCoroutineContext().isActive) {
-            val connected = performCheck(checkUrl)
-            emit(connected)
-            if (connected) return@flow
-            delay(POLL_INTERVAL_MS)
-        }
-    }
-
-    private suspend fun performCheck(checkUrl: String): Boolean =
-        withContext(Dispatchers.IO) {
-            try {
-                val url = URL(checkUrl)
-                val connection = url.openConnection() as HttpURLConnection
-                connection.instanceFollowRedirects = false
-                connection.connectTimeout = CONNECTION_TIMEOUT_MS
-                connection.readTimeout = READ_TIMEOUT_MS
-                connection.useCaches = false
-                try {
-                    connection.connect()
-                    connection.responseCode == HTTP_NO_CONTENT
-                } finally {
-                    connection.disconnect()
+class ConnectivityChecker
+    @Inject
+    constructor() {
+        /**
+         * Emits a [Flow] of booleans indicating whether internet connectivity
+         * has been established (i.e., captive portal authentication succeeded).
+         *
+         * @param checkUrl The URL to poll. Defaults to [DEFAULT_CHECK_URL].
+         * @return A [Flow] that emits true when a 204 response is received, false otherwise.
+         */
+        fun checkConnectivity(checkUrl: String = DEFAULT_CHECK_URL): Flow<Boolean> =
+            flow {
+                while (currentCoroutineContext().isActive) {
+                    val connected = performCheck(checkUrl)
+                    emit(connected)
+                    if (connected) return@flow
+                    delay(POLL_INTERVAL_MS)
                 }
-            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                false
             }
+
+        private suspend fun performCheck(checkUrl: String): Boolean =
+            withContext(Dispatchers.IO) {
+                try {
+                    val url = URL(checkUrl)
+                    val connection = url.openConnection() as HttpURLConnection
+                    connection.instanceFollowRedirects = false
+                    connection.connectTimeout = CONNECTION_TIMEOUT_MS
+                    connection.readTimeout = READ_TIMEOUT_MS
+                    connection.useCaches = false
+                    try {
+                        connection.connect()
+                        connection.responseCode == HTTP_NO_CONTENT
+                    } finally {
+                        connection.disconnect()
+                    }
+                } catch (
+                    @Suppress("TooGenericExceptionCaught") e: Exception,
+                ) {
+                    false
+                }
+            }
+
+        companion object {
+            /** Primary connectivity check URL. */
+            const val DEFAULT_CHECK_URL = "https://connectivitycheck.stevenfoerster.com/generate_204"
+
+            /** Fallback connectivity check URL (Google's public endpoint). */
+            const val FALLBACK_CHECK_URL = "http://connectivitycheck.gstatic.com/generate_204"
+
+            /** Polling interval between connectivity checks in milliseconds. */
+            const val POLL_INTERVAL_MS = 5_000L
+
+            /** HTTP connection timeout in milliseconds. */
+            private const val CONNECTION_TIMEOUT_MS = 5_000
+
+            /** HTTP read timeout in milliseconds. */
+            private const val READ_TIMEOUT_MS = 5_000
+
+            /** HTTP 204 No Content — the expected response for successful connectivity. */
+            private const val HTTP_NO_CONTENT = 204
         }
-
-    companion object {
-        /** Primary connectivity check URL. */
-        const val DEFAULT_CHECK_URL = "https://connectivitycheck.stevenfoerster.com/generate_204"
-
-        /** Fallback connectivity check URL (Google's public endpoint). */
-        const val FALLBACK_CHECK_URL = "http://connectivitycheck.gstatic.com/generate_204"
-
-        /** Polling interval between connectivity checks in milliseconds. */
-        const val POLL_INTERVAL_MS = 5_000L
-
-        /** HTTP connection timeout in milliseconds. */
-        private const val CONNECTION_TIMEOUT_MS = 5_000
-
-        /** HTTP read timeout in milliseconds. */
-        private const val READ_TIMEOUT_MS = 5_000
-
-        /** HTTP 204 No Content — the expected response for successful connectivity. */
-        private const val HTTP_NO_CONTENT = 204
     }
-}

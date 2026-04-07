@@ -18,39 +18,42 @@ import javax.inject.Inject
  * the current configuration as reactive state for the Compose UI.
  */
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val preferences: PortholePreferences,
-) : ViewModel() {
+class SettingsViewModel
+    @Inject
+    constructor(
+        private val preferences: PortholePreferences,
+    ) : ViewModel() {
+        /** The current session configuration. */
+        val sessionConfig: StateFlow<SessionConfig> =
+            preferences.sessionConfig
+                .stateIn(viewModelScope, SharingStarted.Eagerly, SessionConfig())
 
-    /** The current session configuration. */
-    val sessionConfig: StateFlow<SessionConfig> = preferences.sessionConfig
-        .stateIn(viewModelScope, SharingStarted.Eagerly, SessionConfig())
+        /** The current connectivity check URL. */
+        val connectivityCheckUrl: StateFlow<String> =
+            preferences.connectivityCheckUrl
+                .stateIn(
+                    viewModelScope,
+                    SharingStarted.Eagerly,
+                    com.stevenfoerster.porthole.network.ConnectivityChecker.DEFAULT_CHECK_URL,
+                )
 
-    /** The current connectivity check URL. */
-    val connectivityCheckUrl: StateFlow<String> = preferences.connectivityCheckUrl
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            com.stevenfoerster.porthole.network.ConnectivityChecker.DEFAULT_CHECK_URL,
-        )
+        /** Updates the session timeout. */
+        fun setTimeoutSeconds(seconds: Int) {
+            viewModelScope.launch { preferences.setTimeoutSeconds(seconds) }
+        }
 
-    /** Updates the session timeout. */
-    fun setTimeoutSeconds(seconds: Int) {
-        viewModelScope.launch { preferences.setTimeoutSeconds(seconds) }
+        /** Updates the JavaScript enabled setting. */
+        fun setJsEnabled(enabled: Boolean) {
+            viewModelScope.launch { preferences.setJsEnabled(enabled) }
+        }
+
+        /** Updates the strict mode setting. */
+        fun setStrictMode(strict: Boolean) {
+            viewModelScope.launch { preferences.setStrictMode(strict) }
+        }
+
+        /** Updates the connectivity check URL. */
+        fun setConnectivityCheckUrl(url: String) {
+            viewModelScope.launch { preferences.setConnectivityCheckUrl(url) }
+        }
     }
-
-    /** Updates the JavaScript enabled setting. */
-    fun setJsEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferences.setJsEnabled(enabled) }
-    }
-
-    /** Updates the strict mode setting. */
-    fun setStrictMode(strict: Boolean) {
-        viewModelScope.launch { preferences.setStrictMode(strict) }
-    }
-
-    /** Updates the connectivity check URL. */
-    fun setConnectivityCheckUrl(url: String) {
-        viewModelScope.launch { preferences.setConnectivityCheckUrl(url) }
-    }
-}

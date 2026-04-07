@@ -88,10 +88,11 @@ fun MainScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(24.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -118,12 +119,14 @@ fun MainScreen(
                     }
                 },
                 enabled = sessionState == SessionState.IDLE && gatewayIp != null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(64.dp),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Wifi,
@@ -157,13 +160,15 @@ private fun GatewayStatusCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (gatewayIp != null) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.errorContainer
-            },
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (gatewayIp != null) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.errorContainer
+                    },
+            ),
         onClick = onRefresh,
     ) {
         Row(
@@ -171,17 +176,19 @@ private fun GatewayStatusCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = if (gatewayIp != null) {
-                    Icons.Filled.CheckCircle
-                } else {
-                    Icons.Filled.Error
-                },
+                imageVector =
+                    if (gatewayIp != null) {
+                        Icons.Filled.CheckCircle
+                    } else {
+                        Icons.Filled.Error
+                    },
                 contentDescription = null,
-                tint = if (gatewayIp != null) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onErrorContainer
-                },
+                tint =
+                    if (gatewayIp != null) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onErrorContainer
+                    },
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
@@ -205,12 +212,13 @@ private fun SessionStateCard(
     remainingSeconds: Int,
     modifier: Modifier = Modifier,
 ) {
-    val (label, color) = when (sessionState) {
-        SessionState.IDLE -> "Ready" to MaterialTheme.colorScheme.outline
-        SessionState.ACTIVE -> "Active ($remainingSeconds s)" to Color(0xFF388E3C)
-        SessionState.EXPIRED -> "Expired" to MaterialTheme.colorScheme.error
-        SessionState.CLOSED -> "Closed" to MaterialTheme.colorScheme.outline
-    }
+    val (label, color) =
+        when (sessionState) {
+            SessionState.IDLE -> "Ready" to MaterialTheme.colorScheme.outline
+            SessionState.ACTIVE -> "Active ($remainingSeconds s)" to Color(0xFF388E3C)
+            SessionState.EXPIRED -> "Expired" to MaterialTheme.colorScheme.error
+            SessionState.CLOSED -> "Closed" to MaterialTheme.colorScheme.outline
+        }
 
     Card(
         modifier = modifier.fillMaxWidth(),

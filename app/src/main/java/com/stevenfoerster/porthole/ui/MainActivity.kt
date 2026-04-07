@@ -17,7 +17,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.stevenfoerster.porthole.notification.SessionForegroundService
-import com.stevenfoerster.porthole.session.SessionState
 import com.stevenfoerster.porthole.ui.navigation.PortholeRoutes
 import com.stevenfoerster.porthole.ui.theme.PortholeTheme
 import com.stevenfoerster.porthole.ui.viewmodel.MainViewModel
@@ -34,7 +33,6 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     private val notificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
             // Permission result handled — notification will show or not based on grant
@@ -50,11 +48,12 @@ class MainActivity : ComponentActivity() {
                 val mainViewModel: MainViewModel = hiltViewModel()
                 val firstRunCompleted by mainViewModel.firstRunCompleted.collectAsState()
 
-                val startDestination = if (firstRunCompleted) {
-                    PortholeRoutes.MAIN
-                } else {
-                    PortholeRoutes.FIRST_RUN
-                }
+                val startDestination =
+                    if (firstRunCompleted) {
+                        PortholeRoutes.MAIN
+                    } else {
+                        PortholeRoutes.FIRST_RUN
+                    }
 
                 NavHost(
                     navController = navController,
@@ -99,11 +98,12 @@ class MainActivity : ComponentActivity() {
 
                     composable(
                         route = "${PortholeRoutes.PORTAL}/{gateway}/{jsEnabled}/{strictMode}",
-                        arguments = listOf(
-                            navArgument("gateway") { type = NavType.StringType },
-                            navArgument("jsEnabled") { type = NavType.BoolType },
-                            navArgument("strictMode") { type = NavType.BoolType },
-                        ),
+                        arguments =
+                            listOf(
+                                navArgument("gateway") { type = NavType.StringType },
+                                navArgument("jsEnabled") { type = NavType.BoolType },
+                                navArgument("strictMode") { type = NavType.BoolType },
+                            ),
                     ) { backStackEntry ->
                         val gateway = backStackEntry.arguments?.getString("gateway") ?: return@composable
                         val jsEnabled = backStackEntry.arguments?.getBoolean("jsEnabled") ?: false
@@ -115,8 +115,9 @@ class MainActivity : ComponentActivity() {
                             gatewayIp = gateway,
                             jsEnabled = jsEnabled,
                             strictMode = strictMode,
-                            connectivityCheckUrl = com.stevenfoerster.porthole.network
-                                .ConnectivityChecker.DEFAULT_CHECK_URL,
+                            connectivityCheckUrl =
+                                com.stevenfoerster.porthole.network
+                                    .ConnectivityChecker.DEFAULT_CHECK_URL,
                             onSessionEnded = {
                                 startService(
                                     SessionForegroundService.stopIntent(this@MainActivity),

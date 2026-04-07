@@ -11,14 +11,16 @@ import android.webkit.WebView
  * See docs/THREAT_MODEL.md for the rationale behind each setting.
  */
 object WebViewSettings {
-
     /**
      * Applies the full set of hardened settings to a [WebView].
      *
      * @param webView The WebView instance to configure.
      * @param jsEnabled Whether JavaScript should be enabled. Defaults to false.
      */
-    fun apply(webView: WebView, jsEnabled: Boolean = false) {
+    fun apply(
+        webView: WebView,
+        jsEnabled: Boolean = false,
+    ) {
         webView.settings.apply {
             // JavaScript: off by default, only enabled when the user explicitly opts in
             @Suppress("SetJavaScriptEnabled")

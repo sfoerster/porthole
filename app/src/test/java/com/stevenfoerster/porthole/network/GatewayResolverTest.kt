@@ -9,24 +9,24 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class GatewayResolverTest {
-
     private val wifiManager = mockk<WifiManager>()
     private val resolver = GatewayResolver(wifiManager)
 
     @Test
     fun `resolve returns gateway IP when available`() {
-        val dhcpInfo = DhcpInfo().apply {
-            // 192.168.1.1 in little-endian: 1 + (168 << 8) + (192 << 16) + (0 << 24)
-            // Actually: 192.168.1.1 LE = 1*1 + 1*256 + 168*65536 + 192*16777216
-            // = 1 + 256 + 11010048 + 3221225472 -- that's wrong for int
-            // Let's compute: 192.168.1.1 in Android LE int:
-            // octet[0]=192, octet[1]=168, octet[2]=1, octet[3]=1
-            // Android stores as: octet[0] | (octet[1] << 8) | (octet[2] << 16) | (octet[3] << 24)
-            // Wait, Android DhcpInfo stores IPs as little-endian:
-            // 192.168.1.1 -> first octet is least significant
-            // = 192 + (168 << 8) + (1 << 16) + (1 << 24)
-            gateway = 192 or (168 shl 8) or (1 shl 16) or (1 shl 24)
-        }
+        val dhcpInfo =
+            DhcpInfo().apply {
+                // 192.168.1.1 in little-endian: 1 + (168 << 8) + (192 << 16) + (0 << 24)
+                // Actually: 192.168.1.1 LE = 1*1 + 1*256 + 168*65536 + 192*16777216
+                // = 1 + 256 + 11010048 + 3221225472 -- that's wrong for int
+                // Let's compute: 192.168.1.1 in Android LE int:
+                // octet[0]=192, octet[1]=168, octet[2]=1, octet[3]=1
+                // Android stores as: octet[0] | (octet[1] << 8) | (octet[2] << 16) | (octet[3] << 24)
+                // Wait, Android DhcpInfo stores IPs as little-endian:
+                // 192.168.1.1 -> first octet is least significant
+                // = 192 + (168 << 8) + (1 << 16) + (1 << 24)
+                gateway = 192 or (168 shl 8) or (1 shl 16) or (1 shl 24)
+            }
         every { wifiManager.dhcpInfo } returns dhcpInfo
 
         assertEquals("192.168.1.1", resolver.resolve())

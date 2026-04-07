@@ -99,12 +99,13 @@ fun PortalScreen(
             factory = { context ->
                 WebView(context).also { webView ->
                     WebViewSettings.apply(webView, jsEnabled)
-                    webView.webViewClient = PortholeWebViewClient(
-                        allowlistManager = viewModel.allowlist,
-                        onNavigationBlocked = { url -> viewModel.onNavigationBlocked(url) },
-                        onPageStarted = { isLoading = true },
-                        onPageFinished = { isLoading = false },
-                    )
+                    webView.webViewClient =
+                        PortholeWebViewClient(
+                            allowlistManager = viewModel.allowlist,
+                            onNavigationBlocked = { url -> viewModel.onNavigationBlocked(url) },
+                            onPageStarted = { isLoading = true },
+                            onPageFinished = { isLoading = false },
+                        )
                     webView.loadUrl("http://$gatewayIp")
                     webViewInstance = webView
                 }

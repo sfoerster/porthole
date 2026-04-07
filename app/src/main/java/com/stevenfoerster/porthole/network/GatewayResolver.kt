@@ -12,36 +12,38 @@ import javax.inject.Singleton
  * gate session starts — a session cannot begin without a resolvable gateway.
  */
 @Singleton
-class GatewayResolver @Inject constructor(
-    private val wifiManager: WifiManager,
-) {
-    /**
-     * Resolves the current WiFi gateway IP as a dotted-decimal string.
-     *
-     * @return The gateway IP (e.g., "192.168.1.1"), or null if unavailable.
-     */
-    @Suppress("deprecation") // DhcpInfo is the only non-Connectivity API available at minSdk 26
-    fun resolve(): String? {
-        val dhcpInfo = wifiManager.dhcpInfo ?: return null
-        val gateway = dhcpInfo.gateway
-        if (gateway == 0) return null
-        return intToIp(gateway)
-    }
-
-    companion object {
+class GatewayResolver
+    @Inject
+    constructor(
+        private val wifiManager: WifiManager,
+    ) {
         /**
-         * Converts a little-endian integer IP address to a dotted-decimal string.
+         * Resolves the current WiFi gateway IP as a dotted-decimal string.
          *
-         * Android's [DhcpInfo] stores IP addresses as little-endian integers,
-         * so the least significant byte is the first octet.
+         * @return The gateway IP (e.g., "192.168.1.1"), or null if unavailable.
          */
-        fun intToIp(ip: Int): String =
-            "${ip and OCTET_MASK}." +
-                "${ip shr BITS_PER_OCTET and OCTET_MASK}." +
-                "${ip shr (BITS_PER_OCTET * 2) and OCTET_MASK}." +
-                "${ip shr (BITS_PER_OCTET * 3) and OCTET_MASK}"
+        @Suppress("deprecation") // DhcpInfo is the only non-Connectivity API available at minSdk 26
+        fun resolve(): String? {
+            val dhcpInfo = wifiManager.dhcpInfo ?: return null
+            val gateway = dhcpInfo.gateway
+            if (gateway == 0) return null
+            return intToIp(gateway)
+        }
 
-        private const val OCTET_MASK = 0xFF
-        private const val BITS_PER_OCTET = 8
+        companion object {
+            /**
+             * Converts a little-endian integer IP address to a dotted-decimal string.
+             *
+             * Android's [DhcpInfo] stores IP addresses as little-endian integers,
+             * so the least significant byte is the first octet.
+             */
+            fun intToIp(ip: Int): String =
+                "${ip and OCTET_MASK}." +
+                    "${ip shr BITS_PER_OCTET and OCTET_MASK}." +
+                    "${ip shr (BITS_PER_OCTET * 2) and OCTET_MASK}." +
+                    "${ip shr (BITS_PER_OCTET * 3) and OCTET_MASK}"
+
+            private const val OCTET_MASK = 0xFF
+            private const val BITS_PER_OCTET = 8
+        }
     }
-}

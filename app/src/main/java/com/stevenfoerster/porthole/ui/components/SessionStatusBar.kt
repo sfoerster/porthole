@@ -39,18 +39,20 @@ fun SessionStatusBar(
     val minutes = remainingSeconds / SECONDS_PER_MINUTE
     val seconds = remainingSeconds % SECONDS_PER_MINUTE
 
-    val backgroundColor = when {
-        isConnected -> TunnelStatusGreen
-        remainingSeconds <= LOW_TIME_THRESHOLD_SECONDS -> TunnelStatusRed
-        remainingSeconds <= MEDIUM_TIME_THRESHOLD_SECONDS -> TunnelStatusAmber
-        else -> TunnelStatusRed
-    }
+    val backgroundColor =
+        when {
+            isConnected -> TunnelStatusGreen
+            remainingSeconds <= LOW_TIME_THRESHOLD_SECONDS -> TunnelStatusRed
+            remainingSeconds <= MEDIUM_TIME_THRESHOLD_SECONDS -> TunnelStatusAmber
+            else -> TunnelStatusRed
+        }
 
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(backgroundColor)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {

@@ -16,19 +16,18 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
     /**
      * Provides an application-scoped [CoroutineScope] backed by [Dispatchers.Main]
      * with a [SupervisorJob] so that child coroutine failures don't cancel siblings.
      */
     @Provides
     @Singleton
-    fun provideCoroutineScope(): CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    fun provideCoroutineScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     /** Provides the system [WifiManager] for gateway resolution. */
     @Provides
     @Singleton
-    fun provideWifiManager(@ApplicationContext context: Context): WifiManager =
-        context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+    fun provideWifiManager(
+        @ApplicationContext context: Context,
+    ): WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 }
