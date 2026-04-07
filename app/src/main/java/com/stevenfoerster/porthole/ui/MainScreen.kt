@@ -1,5 +1,6 @@
 package com.stevenfoerster.porthole.ui
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -36,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.stevenfoerster.porthole.session.SessionState
@@ -107,6 +110,9 @@ fun MainScreen(
                 sessionState = sessionState,
                 remainingSeconds = remainingSeconds,
             )
+
+            // MAC randomization info card
+            MacRandomizationCard()
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -240,6 +246,56 @@ private fun SessionStateCard(
                 color = color,
                 fontWeight = FontWeight.Bold,
             )
+        }
+    }
+}
+
+/**
+ * Info card explaining MAC address randomization and linking to system WiFi settings.
+ *
+ * Some captive portals tie authentication to the device's MAC address. If MAC randomization
+ * is enabled (the default on Android 10+), the device may get a different MAC each time it
+ * connects, requiring re-authentication. This card informs the user and provides a quick
+ * link to the system WiFi settings where they can toggle randomization per-network.
+ */
+@Composable
+private fun MacRandomizationCard(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
+        onClick = {
+            context.startActivity(Intent(android.provider.Settings.ACTION_WIFI_SETTINGS))
+        },
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Shuffle,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "MAC Randomization",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text =
+                        "Some portals tie auth to your MAC address. " +
+                            "Tap to open WiFi settings if you need to disable randomization for this network.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }
