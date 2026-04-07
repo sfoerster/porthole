@@ -238,9 +238,11 @@ private fun SettingsCard(
     }
 }
 
+private const val SECONDS_PER_MINUTE = 60
+
 private fun formatTimeout(seconds: Int): String {
-    val minutes = seconds / 60
-    val remainingSeconds = seconds % 60
+    val minutes = seconds / SECONDS_PER_MINUTE
+    val remainingSeconds = seconds % SECONDS_PER_MINUTE
     return if (remainingSeconds == 0) {
         "${minutes}m"
     } else {

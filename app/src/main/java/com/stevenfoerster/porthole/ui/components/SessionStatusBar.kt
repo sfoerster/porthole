@@ -64,7 +64,7 @@ fun SessionStatusBar(
         )
 
         Text(
-            text = String.format("%d:%02d", minutes, seconds),
+            text = String.format(java.util.Locale.ROOT, "%d:%02d", minutes, seconds),
             color = Color.White,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,

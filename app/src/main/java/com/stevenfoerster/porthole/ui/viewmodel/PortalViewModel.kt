@@ -5,7 +5,6 @@ import com.stevenfoerster.porthole.network.AllowlistManager
 import com.stevenfoerster.porthole.network.ConnectivityChecker
 import com.stevenfoerster.porthole.session.SessionManager
 import com.stevenfoerster.porthole.session.SessionState
-import com.stevenfoerster.porthole.settings.PortholePreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +26,6 @@ class PortalViewModel
         private val sessionManager: SessionManager,
         private val allowlistManager: AllowlistManager,
         private val connectivityChecker: ConnectivityChecker,
-        private val preferences: PortholePreferences,
     ) : ViewModel() {
         /** Current session state. */
         val sessionState: StateFlow<SessionState> = sessionManager.state

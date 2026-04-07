@@ -221,7 +221,7 @@ private fun SessionStateCard(
     val (label, color) =
         when (sessionState) {
             SessionState.IDLE -> "Ready" to MaterialTheme.colorScheme.outline
-            SessionState.ACTIVE -> "Active ($remainingSeconds s)" to Color(0xFF388E3C)
+            SessionState.ACTIVE -> "Active ($remainingSeconds s)" to ActiveSessionGreen
             SessionState.EXPIRED -> "Expired" to MaterialTheme.colorScheme.error
             SessionState.CLOSED -> "Closed" to MaterialTheme.colorScheme.outline
         }
@@ -299,3 +299,6 @@ private fun MacRandomizationCard(modifier: Modifier = Modifier) {
         }
     }
 }
+
+/** Green color used to indicate an active session. */
+private val ActiveSessionGreen = Color(0xFF388E3C)
