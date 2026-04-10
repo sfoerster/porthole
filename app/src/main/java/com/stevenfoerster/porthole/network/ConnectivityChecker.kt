@@ -7,8 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,7 +22,9 @@ import javax.inject.Singleton
 @Singleton
 class ConnectivityChecker
     @Inject
-    constructor() {
+    constructor(
+        private val connectionFactory: HttpUrlConnectionFactory,
+    ) {
         /**
          * Emits a [Flow] of booleans indicating whether internet connectivity
          * has been established (i.e., captive portal authentication succeeded).
@@ -35,18 +35,25 @@ class ConnectivityChecker
         fun checkConnectivity(checkUrl: String = DEFAULT_CHECK_URL): Flow<Boolean> =
             flow {
                 while (currentCoroutineContext().isActive) {
-                    val connected = performCheck(checkUrl)
+                    val connected = performCheckWithFallback(checkUrl)
                     emit(connected)
                     if (connected) return@flow
                     delay(POLL_INTERVAL_MS)
                 }
             }
 
+        private suspend fun performCheckWithFallback(checkUrl: String): Boolean {
+            if (performCheck(checkUrl)) return true
+            if (checkUrl == DEFAULT_CHECK_URL) {
+                return performCheck(FALLBACK_CHECK_URL)
+            }
+            return false
+        }
+
         private suspend fun performCheck(checkUrl: String): Boolean =
             withContext(Dispatchers.IO) {
                 try {
-                    val url = URL(checkUrl)
-                    val connection = url.openConnection() as HttpURLConnection
+                    val connection = connectionFactory.open(checkUrl)
                     connection.instanceFollowRedirects = false
                     connection.connectTimeout = CONNECTION_TIMEOUT_MS
                     connection.readTimeout = READ_TIMEOUT_MS

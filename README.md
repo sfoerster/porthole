@@ -45,7 +45,7 @@ For the full threat model, see [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md).
 - **Time-limited sessions**: Hard maximum of 10 minutes, user-configurable down to 30 seconds
 - **Persistent warning**: A non-dismissible notification reminds you the tunnel is bypassed
 - **No data persistence**: Porthole stores no user data, browsing history, or credentials
-- **No network calls**: The app itself makes no network requests — only the WebView does
+- **Minimal app-initiated traffic**: Outside the WebView, Porthole only performs captive-portal connectivity probes and never sends analytics or telemetry
 - **No analytics or telemetry**: Zero tracking, zero phone-home behavior
 
 ## Installation

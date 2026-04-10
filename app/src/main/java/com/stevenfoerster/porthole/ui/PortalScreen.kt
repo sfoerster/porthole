@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
@@ -36,8 +37,8 @@ import com.stevenfoerster.porthole.webview.WebViewSettings
  * @param gatewayIp The resolved gateway IP to navigate to.
  * @param jsEnabled Whether JavaScript is enabled for this session.
  * @param strictMode Whether strict allowlist mode is active.
- * @param connectivityCheckUrl The URL to poll for connectivity checks.
  * @param onSessionEnded Callback invoked when the session ends (expired or closed).
+ * @param onSessionDisposed Callback invoked if the screen is disposed before the normal session-end path runs.
  */
 @Composable
 fun PortalScreen(
@@ -45,8 +46,8 @@ fun PortalScreen(
     gatewayIp: String,
     jsEnabled: Boolean,
     strictMode: Boolean,
-    connectivityCheckUrl: String,
     onSessionEnded: () -> Unit,
+    onSessionDisposed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sessionState by viewModel.sessionState.collectAsState()
@@ -55,10 +56,26 @@ fun PortalScreen(
     val isConnected by viewModel.isConnected.collectAsState()
     var isLoading by remember { mutableStateOf(true) }
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
+    val latestSessionState = rememberUpdatedState(sessionState)
+    val latestWebViewInstance = rememberUpdatedState(webViewInstance)
+    val latestOnSessionEnded = rememberUpdatedState(onSessionEnded)
+    val latestOnSessionDisposed = rememberUpdatedState(onSessionDisposed)
+    val sessionFinalizer =
+        remember {
+            PortalSessionFinalizer(
+                closeActiveSession = { viewModel.closeSession() },
+                cleanupSession = {
+                    latestWebViewInstance.value?.let { PortholeWebViewClient.performSessionCleanup(it) }
+                },
+                resetToIdle = { viewModel.resetToIdle() },
+                onSessionEnded = { latestOnSessionEnded.value.invoke() },
+                onSessionDisposed = { latestOnSessionDisposed.value.invoke() },
+            )
+        }
 
     // Start connectivity checking
     LaunchedEffect(gatewayIp) {
-        viewModel.initializeSession(gatewayIp, strictMode, connectivityCheckUrl)
+        viewModel.initializeSession(gatewayIp, strictMode)
             .collect { connected ->
                 viewModel.setConnected(connected)
             }
@@ -66,20 +83,16 @@ fun PortalScreen(
 
     // Handle session end
     LaunchedEffect(sessionState) {
+        sessionFinalizer.handleStateChange(sessionState)
         if (sessionState == SessionState.EXPIRED || sessionState == SessionState.CLOSED) {
-            webViewInstance?.let { PortholeWebViewClient.performSessionCleanup(it) }
             webViewInstance = null
-            viewModel.resetToIdle()
-            onSessionEnded()
         }
     }
 
     // Cleanup on disposal (back navigation, etc.)
     DisposableEffect(Unit) {
         onDispose {
-            if (sessionState == SessionState.ACTIVE) {
-                viewModel.closeSession()
-            }
+            sessionFinalizer.handleDisposal(latestSessionState.value)
         }
     }
 

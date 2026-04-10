@@ -17,7 +17,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.stevenfoerster.porthole.network.ConnectivityChecker
 import com.stevenfoerster.porthole.notification.SessionForegroundService
 import com.stevenfoerster.porthole.ui.navigation.PortholeRoutes
 import com.stevenfoerster.porthole.ui.theme.PortholeTheme
@@ -139,12 +138,16 @@ private fun PortholeApp(activity: MainActivity) {
                 gatewayIp = gateway,
                 jsEnabled = jsEnabled,
                 strictMode = strictMode,
-                connectivityCheckUrl = ConnectivityChecker.DEFAULT_CHECK_URL,
                 onSessionEnded = {
                     activity.startService(
                         SessionForegroundService.stopIntent(activity),
                     )
                     navController.popBackStack(PortholeRoutes.MAIN, inclusive = false)
+                },
+                onSessionDisposed = {
+                    activity.startService(
+                        SessionForegroundService.stopIntent(activity),
+                    )
                 },
             )
         }

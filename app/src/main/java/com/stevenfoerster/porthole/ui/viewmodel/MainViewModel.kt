@@ -44,7 +44,7 @@ class MainViewModel
         /** Whether the first-run setup has been completed. */
         val firstRunCompleted: StateFlow<Boolean> =
             preferences.firstRunCompleted
-                .stateIn(viewModelScope, SharingStarted.Eagerly, true)
+                .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
         private val _gatewayIp = MutableStateFlow<String?>(null)
 

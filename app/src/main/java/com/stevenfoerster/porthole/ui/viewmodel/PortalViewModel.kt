@@ -5,11 +5,15 @@ import com.stevenfoerster.porthole.network.AllowlistManager
 import com.stevenfoerster.porthole.network.ConnectivityChecker
 import com.stevenfoerster.porthole.session.SessionManager
 import com.stevenfoerster.porthole.session.SessionState
+import com.stevenfoerster.porthole.settings.PortholePreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -26,6 +30,7 @@ class PortalViewModel
         private val sessionManager: SessionManager,
         private val allowlistManager: AllowlistManager,
         private val connectivityChecker: ConnectivityChecker,
+        private val preferences: PortholePreferences,
     ) : ViewModel() {
         /** Current session state. */
         val sessionState: StateFlow<SessionState> = sessionManager.state
@@ -60,11 +65,12 @@ class PortalViewModel
         fun initializeSession(
             gatewayIp: String,
             strictMode: Boolean,
-            connectivityCheckUrl: String = ConnectivityChecker.DEFAULT_CHECK_URL,
-        ): Flow<Boolean> {
-            allowlistManager.initialize(gatewayIp, strictMode)
-            return connectivityChecker.checkConnectivity(connectivityCheckUrl)
-        }
+        ): Flow<Boolean> =
+            flow {
+                allowlistManager.initialize(gatewayIp, strictMode)
+                val connectivityCheckUrl = preferences.connectivityCheckUrl.first()
+                emitAll(connectivityChecker.checkConnectivity(connectivityCheckUrl))
+            }
 
         /** Called by the WebViewClient when a navigation is blocked. */
         fun onNavigationBlocked(url: String) {
@@ -97,6 +103,9 @@ class PortalViewModel
 
         /** Resets the session to idle after cleanup is complete. */
         fun resetToIdle() {
+            allowlistManager.clear()
+            _blockedUrl.value = null
+            _isConnected.value = false
             sessionManager.resetToIdle()
         }
     }
