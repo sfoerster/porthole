@@ -17,6 +17,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = System.getenv("VERSION_NAME")?.removePrefix("v") ?: "0.1.0"
+        setProperty("archivesBaseName", "porthole")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

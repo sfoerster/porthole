@@ -90,7 +90,7 @@ cd porthole
 ./gradlew assembleDebug
 ```
 
-The debug APK will be at `app/build/outputs/apk/debug/app-debug.apk`.
+The debug APK will be at `app/build/outputs/apk/debug/porthole-debug.apk`.
 
 ### Test
 
